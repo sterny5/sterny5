@@ -1,19 +1,19 @@
-# PREPARES WORKSPACE
+# Project 3: Code 1
 
-## loads necessary libraries
+## Prepares Workspace
+### loads necessary libraries
 ```{r}
 library(tidyverse)
 ```
-
-## Reads in pdb file
+### Reads in pdb file
 ```{r}
 pdbFile <- readLines("C:/Users/Sternfeld/Desktop/ABT785/1ids.pdb")
 ```
 
 
-# GENERATES DATAFRAME FOR ATOMS
+## Generates dataframe for atoms
 
-## uses substring to collect atom elements to add to dataframe
+### uses substring to collect atom elements to add to dataframe
 ```{r}
 columns <- c("Atom_serial_number", "Atom_name", "Residue_sequence_number", "Residue_name", "Chain", "Temperature_factor")
 AtomDF <- data.frame(matrix(nrow = 0, ncol = length(columns)))
@@ -27,16 +27,16 @@ for (i in 1:length(pdbFile)) {
 } 
 ```
 
-## Converts columns to numerical value
+### Converts columns to numerical value
 ```{r}
 NumColumns <-c("Atom_serial_number", "Residue_sequence_number", "Temperature_factor")
 AtomDF[, NumColumns] <- lapply(NumColumns, function(x) as.numeric(AtomDF[[x]]))
 ```
 
 
-# GENERATES DATAFRAME FOR SECONDARY STRUCTURES
+## Generates dataframe for secondary structures
 
-## uses substring to identify secondary structures to add to dataframe
+### uses substring to identify secondary structures to add to dataframe
 ```{r}
 columns <- c("Type", "Chain", "ID#", "Start", "End")
 secondaryDF <- data.frame(matrix(nrow = 0, ncol = length(columns)))
@@ -53,25 +53,25 @@ for (i in 1:length(pdbFile)) {
 }
 ```
 
-## Converts columns to numerical value
+### Converts columns to numerical value
 ```{r}
 NumColumns <-c("ID#", "Start", "End")
 secondaryDF[, NumColumns] <- lapply(NumColumns, function(x) as.numeric(secondaryDF[[x]]))
 ```
 
-## Sort by Chain and Residue number 
+### Sort by Chain and Residue number 
 ```{r}
 secondaryDF <- secondaryDF %>% arrange(Chain, Start)
 ```
 
 
-# GENERATES DATAFRAME FOR LOOP ATOMS
+## Generates dataframe for loop atoms
 
-## Make empty dataframe for loop atoms
+### Make empty dataframe for loop atoms
 ```{r}
 LoopAtoms <- data.frame(matrix(nrow = 0, ncol = length(columns)))
 ```
-## Identify Loop # and their associated atoms
+### Identify Loop # and their associated atoms
 ```{r}
 for (i in LETTERS[1:4]) {
   #subset df by Chain
@@ -88,14 +88,14 @@ for (i in LETTERS[1:4]) {
   }
 }
 ```
-## Adds a Chain-Loop column
+### Adds a Chain-Loop column
 ```{r}
 LoopAtoms$ChainLoop <- paste0(LoopAtoms$Chain, "-", LoopAtoms$LoopNumber)
 ```
 
 
-# FINAL MATH AND OUTPUT
-## QUESTION 2 
+## Final math and output
+### Question #2 
 > Prints the average temperature (B) factor value for atoms in each loop
 ```{r}
 for (i in unique(LoopAtoms$ChainLoop)){
@@ -104,7 +104,7 @@ for (i in unique(LoopAtoms$ChainLoop)){
 }
 ```
 
-## QUESTION 3
+### Question #3
 > Writes a csv file containing the atoms within loop regions with their associated residue number and name, among additional information
 ```{r}
 write.csv(LoopAtoms, "C:/Users/Sternfeld/Desktop/ABT785/LoopAtoms.csv")
