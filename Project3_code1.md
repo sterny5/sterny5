@@ -1,7 +1,8 @@
 # Project 3: Code 1
 
 ## Prepares Workspace
-### loads necessary libraries
+
+### Loads necessary libraries
 ```{r}
 library(tidyverse)
 ```
@@ -10,10 +11,10 @@ library(tidyverse)
 pdbFile <- readLines("C:/Users/Sternfeld/Desktop/ABT785/1ids.pdb")
 ```
 
+## Generates data frame for atoms
 
-## Generates dataframe for atoms
-
-### uses substring to collect atom elements to add to dataframe
+### Converts pdb file into data frame of atoms using substring
+> As the pdb file is a txt file with multiple information with specified spacing, substring can be used to extract the desired elements. Here, "ATOM" is searched for at the beginning of each line, specifying the presence of an atom and its associated information. A data frame is generated with the column names specified below.
 ```{r}
 columns <- c("Atom_serial_number", "Atom_name", "Residue_sequence_number", "Residue_name", "Chain", "Temperature_factor")
 AtomDF <- data.frame(matrix(nrow = 0, ncol = length(columns)))
@@ -28,15 +29,17 @@ for (i in 1:length(pdbFile)) {
 ```
 
 ### Converts columns to numerical value
+> When the data frame above is made, substring does not know to make the column numeric. To do the math required later, these columns must be converted to numeric, as is done below.
 ```{r}
 NumColumns <-c("Atom_serial_number", "Residue_sequence_number", "Temperature_factor")
 AtomDF[, NumColumns] <- lapply(NumColumns, function(x) as.numeric(AtomDF[[x]]))
 ```
 
 
-## Generates dataframe for secondary structures
+## Generates data frame for secondary structures
 
-### uses substring to identify secondary structures to add to dataframe
+### Converts pdb file into data frame of secondary structures using substring
+> The pdb file also contains information for the secondary structures alpha helices and beta sheets. This information is placed into a data frame using substring, similarly to how the atom data frame was generated.
 ```{r}
 columns <- c("Type", "Chain", "ID#", "Start", "End")
 secondaryDF <- data.frame(matrix(nrow = 0, ncol = length(columns)))
@@ -54,12 +57,14 @@ for (i in 1:length(pdbFile)) {
 ```
 
 ### Converts columns to numerical value
+> When the data frame above is made, substring does not know to make the column numeric. To do the math required later, these columns must be converted to numeric, as is done below.
 ```{r}
 NumColumns <-c("ID#", "Start", "End")
 secondaryDF[, NumColumns] <- lapply(NumColumns, function(x) as.numeric(secondaryDF[[x]]))
 ```
 
 ### Sort by Chain and Residue number 
+> For reasons that will be pointed about below, this data frame must be sorted by Chain and Start residue.
 ```{r}
 secondaryDF <- secondaryDF %>% arrange(Chain, Start)
 ```
@@ -72,6 +77,7 @@ secondaryDF <- secondaryDF %>% arrange(Chain, Start)
 LoopAtoms <- data.frame(matrix(nrow = 0, ncol = length(columns)))
 ```
 ### Identify Loop # and their associated atoms
+> As a loop is identified as amino acids between two secondary structures, for each Chain, with the secondaryDF structured above (by Chain and then Start residue), we can simply find all atoms from residues that fall between the End residue of one secondary structure (n) and the Start of the next secondary structure (n+1).
 ```{r}
 for (i in LETTERS[1:4]) {
   #subset df by Chain
@@ -89,6 +95,7 @@ for (i in LETTERS[1:4]) {
 }
 ```
 ### Adds a Chain-Loop column
+> To aid in the coding below (Final math and output section), which asks for the average of the individual loops within each chain, I made a "ChainLoop" column for the data frame.
 ```{r}
 LoopAtoms$ChainLoop <- paste0(LoopAtoms$Chain, "-", LoopAtoms$LoopNumber)
 ```
