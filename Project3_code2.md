@@ -1,7 +1,8 @@
-# Project 3; Code 2
-## PREPARES WORKSPACE
+# Project 3: Code 2
 
-### loads necessary libraries
+## Prepares Workspace
+
+### Loads necessary libraries
 ```{r}
 library(tidyverse)
 ```
@@ -9,9 +10,11 @@ library(tidyverse)
 ```{r}
 pdbFile <- readLines("C:/Users/Sternfeld/Desktop/ABT785/1ids.pdb")
 ```
-## Generated data frame of alpha carbons
 
-### uses substring to collect atom elements to add to dataframe
+## Generates data frame for alpha carbon atoms
+
+### Converts pdb file into data frame of atoms using substring
+> As the pdb file is a txt file with multiple information with specified spacing, substring can be used to extract the desired elements. Here, "ATOM" is searched for at the beginning of each line, specifying the presence of an atom and its associated information. A data frame is generated with the column names specified below.
 ```{r}
 columns <- c("Atom_serial_number", "Atom_name", "Residue_sequence_number", "Residue_name","Chain", "Temperature_factor", 
              "X_orthogonal_coordinate", "Y_orthogonal_coordinate", "Z_orthogonal_coordinate")
@@ -28,6 +31,7 @@ for (i in 1:length(pdbFile)) {
 ```
 
 ### Converts columns to numerical value
+> When the data frame above is made, substring does not know to make the column numeric. To do the math required later, these columns must be converted to numeric, as is done below.
 ```{r}
 NumColumns <-c("Atom_serial_number", "Residue_sequence_number", "Temperature_factor", 
                "X_orthogonal_coordinate", "Y_orthogonal_coordinate", "Z_orthogonal_coordinate")
@@ -35,6 +39,7 @@ AtomDF[, NumColumns] <- lapply(NumColumns, function(x) as.numeric(AtomDF[[x]]))
 ```
 
 ### Isolate Alpha Carbons and make a DF with their information
+> Only alpha carbon atoms will be used for downstream analysis, so they are subset out of the main atom data frame
 ```{r}
 CA_atoms <- subset(AtomDF, Atom_name =='CA')
 CA_atoms <- CA_atoms[, c("Residue_sequence_number", "Chain", "X_orthogonal_coordinate", "Y_orthogonal_coordinate", "Z_orthogonal_coordinate")]
@@ -42,7 +47,8 @@ CA_atoms <- CA_atoms[, c("Residue_sequence_number", "Chain", "X_orthogonal_coord
 
 ## Generates data frame for secondary structures
 
-### Uses substring to identify secondary structures to add to dataframe
+### Converts pdb file into data frame of secondary structures using substring
+> The pdb file also contains information for the secondary structures alpha helices and beta sheets. This information is placed into a data frame using substring, similarly to how the atom data frame was generated.
 ```{r}
 columns <- c("Type", "Chain", "ID#", "Start", "End")
 secondaryDF <- data.frame(matrix(nrow = 0, ncol = length(columns)))
@@ -60,13 +66,14 @@ for (i in 1:length(pdbFile)) {
 ```
 
 ### Converts the following columns to numbers
+> When the data frame above is made, substring does not know to make the column numeric. To do the math required later, these columns must be converted to numeric, as is done below.
 ```{r}
 NumColumns <-c("ID#", "Start", "End")
 secondaryDF[, NumColumns] <- lapply(NumColumns, function(x) as.numeric(secondaryDF[[x]]))
 ```
 
-### merges alpha carbon (CA) coords into DF listing first and last residues
-> if statement is used in case there are no alpha helices or beta sheets
+### Merges alpha carbon (CA) coordinates with secondary data frame
+> Here the secondaryDF and CA_atoms data frames are merged so that the ***Start*** residue of the secondary structure pulls in the alpha carbon coordinates from that residue (and Chain). The columns are then labeled Start_X, Start_Y, and Start_Z, because next this resulting data frame is merged with the alpha carbon data frame again, but this time using the ***End*** residue of the secondary stucture (and Chain). These newly pulled in columns are labeled with End_X, End_Y, and End_Z. A new column is then made calculating the distance between the first and last residue of the secondary structure. In case there are no secondary structures, an if statement is used around this entire section of code, such that it will be skipped if none exist.
 ```{r}
 if(length(secondaryDF$Type)>0){
   secondaryDF <- left_join(secondaryDF, CA_atoms, by = c("Start" = "Residue_sequence_number", "Chain"))
@@ -87,7 +94,7 @@ if(length(secondaryDF$Type)>0){
 
 ## Final Output
 
->Questions 2-4 are answered within this same code. Determines if there are alpha helices and/or beta sheets in protein and then prints distances between their start and end, if applicable
+>Questions 2-4 are answered within this same code. An if statement is used to determine if there are alpha helices and/or beta sheets in protein, printing if only one or neither type exist in the protein. And then if one or both types exists, the data frame of secondary structures will be printed, which includes the distances between their first and last alpha carbon.
 ```{r}
 if ("HELIX" %in% unique(secondaryDF$Type) & "SHEET" %in% unique(secondaryDF$Type)) {
   print(secondaryDF)
