@@ -77,7 +77,7 @@ secondaryDF <- secondaryDF %>% arrange(Chain, Start)
 LoopAtoms <- data.frame(matrix(nrow = 0, ncol = length(columns)))
 ```
 ### Identify Loop # and their associated atoms
-> As a loop is identified as amino acids between two secondary structures, for each Chain, with the secondaryDF structured above (by Chain and then Start residue), we can simply find all atoms from residues that fall between the End residue of one secondary structure (n) and the Start of the next secondary structure (n+1).
+> As a loop is identified as amino acids between two secondary structures, for each Chain, with the secondaryDF structured above (sorted by Chain and then Start residue), we can simply find all atoms from residues that fall between the ***End*** residue of one secondary structure (n) and the ***Start*** of the next secondary structure (n+1).
 ```{r}
 for (i in LETTERS[1:4]) {
   #subset df by Chain
