@@ -23,7 +23,7 @@ GroupLabels <- read.csv("C:/Users/Sternfeld/Desktop/ABT785/uniprotkbOutput.csv")
 AAs <- c("A", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "Y", "-")
 ```
 
-## Generates data frame of  IDs and sequences
+## Generates data frame of IDs and sequences
 
 ### Loops through ClustalOutput and Generates a data frame with ID and sequence chunks
 > As the ClustalOutput file is a txt file with  information denoted between specialized characters or spacing, we can extract the information needed below (ID and Sequence) as specified below.
@@ -45,7 +45,7 @@ grouped_df <- group_by(df, ID)
 concatenated_df <- summarize(grouped_df, Sequence = paste0(Sequence, collapse = ""))
 concatenated_df <- as.data.frame(concatenated_df)
 ```
-## Generating a data frame of amino acid usage by residue number
+## Generates data frame of amino acid use at all residues across all organisms/IDs
 > To answer Question 2, my goal was to generate a data frame that had the total number of aligned residues as rows and the possible amino acids (and gap) in columns. Then, for at each residue (row), for all IDs/organisms tested, the number of sequences that use each amino acids (columns) were counted and reported.
 
 ### Identifies the length of the alignment
@@ -71,7 +71,7 @@ for (i in 1:AlignedLength){
   AAusage[i,] <- AAinPos
 }
 ```
-## Generates data frame of amino acid use across all organisms/IDs
+## Generates data frame of amino acid frequency at each residue within a specific grouping
 > This is very similar code to above, however, here, instead of obtaining the ***total number*** of each type of amino acid at a residue position for ***all*** organisms/IDs, it calculates the ***percentage*** of each amino acid found at each residue ***within groups*** of organisms/IDs.
 
 ### Merge group label with already generated concatenated sequencing data frame
@@ -88,7 +88,7 @@ GroupNames <- unique(concatenated_df$Group)
 ```{r}
 GroupedDataframes <- list()
 ```
-### Generates data frame of amino acid use percentage by residue number per grouping
+### Creates data frame of amino acid use percentage by residue number per grouping
 > First a temporary data frame is generated to subset by group. With each grouping separated, as done above, the total number of residues containing a specific amino acid is calculated. To obtain a percentage, this number is then divided by the total number of residues analyzed at that position and multiplied by 100.
 ```{r}
 columns <- c(AAs, "-")
