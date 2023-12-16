@@ -114,7 +114,7 @@ for (d in GroupNames[1:length(GroupNames)]) {
 ```{r}
 write.csv(AAusage, "C:/Users/Sternfeld/Desktop/ABT785/AAusage.csv")
 ```
-### Writes a csv for ***each grouping*** containing the ***percentage*** of sequences within that group use the specified amino acid (columns) at each residue number (rows)
+### Writes a csv for ***each grouping*** containing the ***percentage*** of sequences within that group that use the specified amino acid (columns) at each residue number (rows)
 ```{r}
 for (i in names(GroupedDataframes)) {
   write.csv(GroupedDataframes[[i]], paste0("C:/Users/Sternfeld/Desktop/ABT785/", i,".csv"))
